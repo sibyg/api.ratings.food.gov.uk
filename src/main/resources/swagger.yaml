@@ -1,0 +1,253 @@
+# this is an API spec of Food Ratings API in YAML
+swagger: '2.0'
+info:
+  title: Food Ratings API
+  description: Move your app forward with the Food Ratings API
+  version: "1.0.0"
+# the domain of the service
+host: localhost:8080/uk.gov.food.ratings.api
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /regions:
+    get:
+      summary: Regions
+      description: |
+        The Regions endpoint returns basic information about the regions in United Kingdom
+      tags:
+        - Regions
+      responses:
+        '200':
+          description: An array of regions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Region'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/regions/{regionId}':
+    get:
+      tags:
+        - region
+      summary: Find Region by ID
+      description: Returns a single region
+      operationId: getRegionById
+      produces:
+        - application/json
+      parameters:
+        - name: regionId
+          in: path
+          description: ID of region to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Region'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Region not found
+  '/regions/{regionId}/local-authority/{localAuthority}/ratings':
+    get:
+      tags:
+        - ratings
+      summary: Find Rating summary for a given local authory
+      description: Returns a single region
+      operationId: getRatingsForAGivenLocalAuthority
+      produces:
+        - application/json
+      parameters:
+        - name: regionId
+          in: path
+          description: ID of region to return
+          required: true
+          type: string
+        - name: localAuthority
+          in: path
+          description: ID of local authority to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/LocalAuthorityRatingSummary'
+        '400':
+          description: Invalid IDs supplied
+        '404':
+          description: Region / Local Authority not found
+definitions:
+  Rating:
+    type: object
+    properties:
+      id:
+        type: number
+        format: int32
+        description: unique identifier of the rating
+      name:
+        type: string
+        description: name of rating
+      key:
+        type: string
+        description: key of rating
+      keyName:
+        type: string
+        description: key name of rating
+      schemeTypeId:
+        type: number
+        format: int32
+        description: unique scheme type id of the rating
+      meta:
+        $ref: '#/definitions/Meta'
+      links:
+        type: array
+        items:
+            $ref: '#/definitions/Link'
+  RatingsSummary:
+    type: object
+    properties:
+      rating:
+        type: object
+        items:
+            $ref: '#definitions/Rating'
+      percentage:
+        type: number
+        format: float
+      meta:
+        $ref: '#/definitions/Meta'
+      links:
+        type: array
+        items:
+            $ref: '#/definitions/Link'
+  LocalAuthorityRatingSummary:
+    type: object
+    properties:
+      ratingsSummary:
+        type: array
+        items:
+            $ref: '#definitions/RatingsSummary'
+      meta:
+        $ref: '#/definitions/Meta'
+      links:
+        type: array
+        items:
+            $ref: '#/definitions/Link'
+  Region:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier representing a specific Region.
+      name:
+        type: string
+        description: Description of region.
+      nameKey:
+        type: string
+        description: name key of region.
+      code:
+        type: string
+        description: code of region.
+      localAuthorities:
+        type: array
+        items:
+            $ref: '#definitions/LocalAuthority'
+      meta:
+        $ref: '#/definitions/Meta'
+      links:
+        type: array
+        items:
+            $ref: '#/definitions/Link'
+  LocalAuthority:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier representing a local authority.
+      code:
+        type: string
+        description: code of LA.
+      name:
+        type: string
+        description: name key of LA.
+      url:
+        type: string
+        description: url to local authority.
+      email:
+        type: string
+        description: email to local authority.
+      establishmentCount:
+        type: integer
+        format: int32
+        description: count of establishments
+      creationDate:
+        type: string
+        description: when local authority was created
+      lastPublishedDate:
+        type: string
+        description: last published date of ratings summary
+      meta:
+        $ref: '#/definitions/Meta'
+      links:
+        type: array
+        items:
+            $ref: '#/definitions/Link'
+  Meta:
+    type: object
+    properties:
+      dataSource:
+        type: string
+        description: source of the meta data.
+      extractDate:
+        type: string
+        description: unknown
+      itemCount:
+        type: integer
+        format: int32
+        description: current number of items retrieved.
+      returncode:
+        type: string
+        description: http respnse code.
+      totalCount:
+        type: integer
+        format: int32
+        description: total number of items.
+      totalPages:
+        type: integer
+        format: int32
+        description: total number of pages.
+      pageSize:
+        type: integer
+        format: int32
+        description: number of items per page.
+      pageNumber:
+        type: integer
+        format: int32
+        description: current page number.
+  Link:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: link to the schema.
+      href:
+        type: string
+        description: hyper link to a resource/sub-resource
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
