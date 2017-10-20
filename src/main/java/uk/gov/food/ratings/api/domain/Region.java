@@ -3,6 +3,7 @@ package uk.gov.food.ratings.api.domain;
 import java.util.List;
 
 public class Region {
+
     private int id;
 
     public int getId() {

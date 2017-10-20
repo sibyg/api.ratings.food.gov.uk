@@ -1,6 +1,9 @@
 package uk.gov.food.ratings.api;
 
+import uk.gov.food.ratings.api.domain.LocalAuthorities;
+import uk.gov.food.ratings.api.domain.RatingSummaries;
 import uk.gov.food.ratings.api.domain.RatingsSummary;
+import uk.gov.food.ratings.api.domain.Regions;
 import uk.gov.food.ratings.api.service.RatingsEnricher;
 import uk.gov.food.ratings.api.service.RatingsService;
 import uk.gov.food.ratings.api.service.RatingsSorter;
@@ -12,7 +15,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("regions")
@@ -34,14 +36,14 @@ public class RatingsResource {
     @GET
     @Produces({"application/json"})
     public Response getRegions() {
-        return createSuccessfulResponse(ratingsService.getRegions());
+        return createSuccessfulResponse(Regions.instance(ratingsService.getRegions()));
     }
 
     @GET
     @Path("/{regionName}/local-authorities")
     @Produces({"application/json"})
     public Response getLocalAuthoritiesByRegion(@PathParam("regionName") String regionName) {
-        return createSuccessfulResponse(ratingsService.getLocalAuthoritiesByRegion(regionName));
+        return createSuccessfulResponse(LocalAuthorities.instance(ratingsService.getLocalAuthoritiesByRegion(regionName)));
     }
 
     @GET
@@ -51,7 +53,7 @@ public class RatingsResource {
                                                       @PathParam("localAuthorityCode") String localAuthorityCode) {
         List<RatingsSummary> enrichedRatingsSummary = ratingsEnricher.enrich(ratingsService.getRatingsSummaryForAGivenLocalAuthority(localAuthorityCode));
         ratingsSorter.sort(enrichedRatingsSummary);
-        return createSuccessfulResponse(enrichedRatingsSummary);
+        return createSuccessfulResponse(RatingSummaries.instance(enrichedRatingsSummary));
     }
 
 

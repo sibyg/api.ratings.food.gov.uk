@@ -38,6 +38,10 @@ public class RatingsServiceImpl implements RatingsService {
     @Override
     public List<RatingsSummary> getRatingsSummaryForAGivenLocalAuthority(String localAuthorityCode) {
         List<Establishment> establishmentsByLocalAuthority = ratingsDao.getEstablishmentsByLocalAuthority(localAuthorityCode);
+        return createRatingsSummary(establishmentsByLocalAuthority);
+    }
+
+    private List<RatingsSummary> createRatingsSummary(List<Establishment> establishmentsByLocalAuthority) {
         Map<String, Long> ratingCountMap = establishmentsByLocalAuthority.stream().collect(groupingBy(Establishment::getRatingKey, Collectors.counting()));
         long sum = ratingCountMap.values().stream().mapToLong(Long::longValue).sum();
         List<RatingsSummary> ratingsSummaries = new ArrayList<>();
